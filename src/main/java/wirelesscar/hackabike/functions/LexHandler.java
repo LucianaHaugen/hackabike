@@ -11,6 +11,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
+import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.amazonaws.util.IOUtils;
@@ -59,7 +60,11 @@ public class LexHandler implements RequestStreamHandler {
     Bike bike = new Bike();
     bike.setBikeId(bikeId);
     DynamoDBQueryExpression<Bike> query = new DynamoDBQueryExpression<Bike>().withHashKeyValues(bike);
-    return mapper.query(Bike.class, query).get(0);
+    PaginatedQueryList<Bike> query1 = mapper.query(Bike.class, query);
+    if (query1.size() > 0) {
+      return query1.get(0);
+    }
+    return null;
   }
 
   @Override
@@ -76,7 +81,8 @@ public class LexHandler implements RequestStreamHandler {
           .getJSONObject("slots")
           .getString("BikeId"));
 
-      if (getBike(bikeId).getCauses().get(cause) == null) {
+      Bike bike = getBike(bikeId);
+      if (bike == null || bike.getCauses().get(cause) == null) {
         updateBike(bikeId, cause, 0);
       } else {
         setActiveCause(bikeId, cause);
