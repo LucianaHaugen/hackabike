@@ -7,6 +7,9 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 
 import wirelesscar.hackabike.persistance.Bike;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class ProcessPosition implements RequestHandler<PositionInput, String> {
 
@@ -22,6 +25,9 @@ public class ProcessPosition implements RequestHandler<PositionInput, String> {
       theBike = new Bike();
       theBike.setBikeId(bikeNr);
       theBike.setDistanceTravelled(0.0);
+      theBike.setActiveCause("Reduce traffic!");
+      theBike.setCauses(new HashMap<>());
+      theBike.getCauses().put(theBike.getActiveCause(), 0);
     } else {
       // existing bike -- calculate a delta from lat and long differences of last observation
       Double lat1 = theBike.getLastSeenLatitude();
@@ -32,6 +38,16 @@ public class ProcessPosition implements RequestHandler<PositionInput, String> {
         double distance = distance(lat1, lat2, long1, long2, 0, 0);
         oldDistanceTravelled = theBike.getDistanceTravelled();
         theBike.setDistanceTravelled(theBike.getDistanceTravelled() + distance);
+
+        // add on the distance travelled to whichever is the current cause for the bike
+        Integer currentCauseScore = theBike.getCauses().get(theBike.getActiveCause());
+        if (currentCauseScore == null) {
+          currentCauseScore = (int) distance;
+          theBike.getCauses().put(theBike.getActiveCause(), currentCauseScore);
+        } else {
+          currentCauseScore = currentCauseScore + (int) distance;
+          theBike.getCauses().put(theBike.getActiveCause(), currentCauseScore);
+        }
       }
     }
     theBike.setLastSeenLatitude(newPosition.getLatitude());
