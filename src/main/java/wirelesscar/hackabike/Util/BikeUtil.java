@@ -14,9 +14,9 @@ public class BikeUtil {
       .build();
   private static DynamoDBMapper mapper = new DynamoDBMapper(client);
 
-  public static void updateBikeCauses(Integer id, String cause, Integer value) {
+  public static void addBikeCause(Integer id, String cause) {
     Bike bike = getBike(id);
-    bike.getCauses().put(cause, value);
+    bike.getCauses().put(cause, 0);
     bike.setActiveCause(cause);
 
     mapper.save(bike);
