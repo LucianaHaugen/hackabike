@@ -15,6 +15,10 @@ public class Bike {
 
   private String activeCause;
 
+  private Double lastSeenLatitude;
+  private Double lastSeenLongitude;
+  private Double distanceTravelled;
+
   @DynamoDBHashKey(attributeName = "bikeId")
   public Integer getBikeId() {
     return bikeId;
@@ -40,5 +44,29 @@ public class Bike {
 
   public void setActiveCause(String activeCause) {
     this.activeCause = activeCause;
+  }
+
+  public Double getLastSeenLatitude() {
+    return lastSeenLatitude;
+  }
+
+  public void setLastSeenLatitude(Double lastSeenLatitude) {
+    this.lastSeenLatitude = lastSeenLatitude;
+  }
+
+  public Double getLastSeenLongitude() {
+    return lastSeenLongitude;
+  }
+
+  public void setLastSeenLongitude(Double lastSeenLongitude) {
+    this.lastSeenLongitude = lastSeenLongitude;
+  }
+
+  public Double getDistanceTravelled() {
+    return distanceTravelled;
+  }
+
+  public void setDistanceTravelled(Double distanceTravelled) {
+    this.distanceTravelled = distanceTravelled;
   }
 }
