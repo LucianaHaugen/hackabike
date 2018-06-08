@@ -13,6 +13,8 @@ public class Bike {
 
   private Map<String, Integer> causes;
 
+  private String activeCause;
+
   @DynamoDBHashKey(attributeName = "bikeId")
   public Integer getBikeId() {
     return bikeId;
@@ -29,5 +31,14 @@ public class Bike {
 
   public void setCauses(Map<String, Integer> causes) {
     this.causes = causes;
+  }
+
+  @DynamoDBAttribute(attributeName = "activeCause")
+  public String getActiveCause() {
+    return activeCause;
+  }
+
+  public void setActiveCause(String activeCause) {
+    this.activeCause = activeCause;
   }
 }
