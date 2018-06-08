@@ -3,9 +3,6 @@ package wirelesscar.hackabike.functions;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,8 +27,7 @@ public class LexHandler implements RequestStreamHandler {
 
   public LexResponse oldhandleRequest(LexRequest input, Context context) {
 
-    // Very ugly but it should not be possible to add a cause if it already exists
-    if (getBike(input.getBikeId()).get(0).getCauses().get(input.getCause()) != null) {
+    if (getBike(input.getBikeId()).getCauses().get(input.getCause()) != null) {
       updateBike(input.getBikeId(), input.getCause(), 0);
     }
 
@@ -41,21 +37,18 @@ public class LexHandler implements RequestStreamHandler {
   }
 
   private void updateBike(Integer id, String cause, Integer value) {
-    Bike bike = new Bike();
-    bike.setBikeId(id);
-    Map<String, Integer> causes = new HashMap<>();
-    causes.put(cause, value);
-    bike.setCauses(causes);
+    Bike bike = getBike(id);
+    bike.getCauses().put(cause, value);
     bike.setActiveCause(cause);
 
     mapper.save(bike);
   }
 
-  private List<Bike> getBike(Integer bikeId) {
+  private Bike getBike(Integer bikeId) {
     Bike bike = new Bike();
     bike.setBikeId(bikeId);
     DynamoDBQueryExpression<Bike> query = new DynamoDBQueryExpression<Bike>().withHashKeyValues(bike);
-    return mapper.query(Bike.class, query);
+    return mapper.query(Bike.class, query).get(0);
   }
 
   @Override
@@ -67,7 +60,7 @@ public class LexHandler implements RequestStreamHandler {
           .getJSONObject("slots")
           .getString("Cause");
 
-      if (getBike(1).get(0).getCauses().get(cause) == null) {
+      if (getBike(1).getCauses().get(cause) == null) {
         updateBike(1, cause, 0);
       } else {
         setActiveCause(1, cause);
