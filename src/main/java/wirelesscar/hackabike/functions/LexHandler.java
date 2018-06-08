@@ -20,6 +20,17 @@ import wirelesscar.hackabike.model.LexResponse;
 import wirelesscar.hackabike.persistance.Bike;
 
 public class LexHandler implements RequestStreamHandler {
+  private static final String response = "{  \n" +
+      "    \"dialogAction\": {\n" +
+      "        \"type\": \"Close\",\n" +
+      "        \"fulfillmentState\": \"Fulfilled\",\n" +
+      "        \"message\": {\n" +
+      "            \"contentType\": \"PlainText\",\n" +
+      "            \"content\": \"You are now biking with a cause!\"\n" +
+      "        }\n" +
+      "    }\n" +
+      "};";
+
   private static AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()
       .withRegion("us-east-1")
       .build();
@@ -54,23 +65,27 @@ public class LexHandler implements RequestStreamHandler {
   @Override
   public void handleRequest(InputStream input, OutputStream output, Context context) throws IOException {
     String jsonString = IOUtils.toString(input);
+    System.out.println(String.format("Got: %s", jsonString));
     try {
       JSONObject json = new JSONObject(jsonString);
       String cause = json.getJSONObject("currentIntent")
           .getJSONObject("slots")
           .getString("Cause");
 
-      if (getBike(1).getCauses().get(cause) == null) {
-        updateBike(1, cause, 0);
+      int bikeId = Integer.valueOf(json.getJSONObject("currentIntent")
+          .getJSONObject("slots")
+          .getString("BikeId"));
+
+      if (getBike(bikeId).getCauses().get(cause) == null) {
+        updateBike(bikeId, cause, 0);
       } else {
-        setActiveCause(1, cause);
+        setActiveCause(bikeId, cause);
       }
 
     } catch (JSONException e) {
       System.out.println("Couldn't parse json");
     }
-
-    output.write("true".getBytes());
+    output.write(response.getBytes());
   }
 
   private void setActiveCause(int id, String cause) {
