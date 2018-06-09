@@ -80,7 +80,7 @@ public class LexHandler implements RequestStreamHandler {
         String responseBlob = IOUtils.toString(response.getEntity().getContent());
         String streetNumber = responseBlob.split("\"formatted_address\" : \"")[1].split("\"")[0];
 
-        output.write(genericResponse.replace("MESSAGE", String.format("Your bike is at: %s", streetNumber))
+        output.write(genericResponse.replace("MESSAGE", String.format("Your bike is at %s", streetNumber))
             .getBytes());
       } catch (Exception e) {
         output.write(genericResponse.replace("MESSAGE", String.format("I could not find any information about your bike")).getBytes());
