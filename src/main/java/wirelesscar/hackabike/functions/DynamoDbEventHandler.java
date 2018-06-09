@@ -26,6 +26,9 @@ public class DynamoDbEventHandler implements RequestHandler<DynamodbEvent, Strin
 
     if (oldBike != null && newBike != null) {
       if (oldBike.getActiveCause().equals(newBike.getActiveCause())) {
+        if (oldBike.getDistanceTravelled() == null) {
+          oldBike.setDistanceTravelled(0.0);
+        }
         double distance = newBike.getDistanceTravelled() - oldBike.getDistanceTravelled();
         if (distance > 0) {
           System.out.println(String.format("DIstance travelled: %f", distance));
