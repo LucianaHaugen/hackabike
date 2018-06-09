@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -56,6 +57,9 @@ public class LexHandler implements RequestStreamHandler {
         case "TellMeAboutBike":
           handleTellMeAboutBike(json, output);
           break;
+        case "TellMeAboutCauses":
+          handleTellMeAboutCauses(output);
+          break;
         default:
           break;
       }
@@ -63,6 +67,26 @@ public class LexHandler implements RequestStreamHandler {
     } catch (JSONException e) {
       System.out.println("Couldn't parse json");
     }
+  }
+
+  private void handleTellMeAboutCauses(OutputStream output) throws IOException {
+    StringBuilder sb = new StringBuilder();
+    Stream.of("Get healthy", "Save the environment", "Reduce traffic").forEach((String s) -> {
+      Cause cause = getCause(s);
+      if (cause != null) {
+        sb.append("* ");
+        String response = "Cause '" + s +
+            "' is currently running for " + cause.getSponsor() +
+            " gathering meters for " +
+            cause.getOrganization() +
+            ". They have so far reached the distance of: " + cause.getActualDistance().intValue() +
+            " meters, of their Goal distance of " + cause.getGoalDistance().intValue() + " meters.";
+        sb.append(response);
+        sb.append("\\n\\n");
+
+      }
+    });
+    output.write(responseAskForScore.replace("MESSAGE", sb.toString()).getBytes());
   }
 
   private void handleFindMyBike(JSONObject json, OutputStream output) throws IOException {
@@ -222,8 +246,8 @@ public class LexHandler implements RequestStreamHandler {
   private void handleTellMeAboutBike(JSONObject json, OutputStream output) throws IOException {
 
     int bikeId = Integer.valueOf(json.getJSONObject("currentIntent")
-            .getJSONObject("slots")
-            .getString("BikeId"));
+        .getJSONObject("slots")
+        .getString("BikeId"));
 
     Bike bike = getBike(bikeId);
     if (bike != null && bike.getLastSeenLatitude() != null && bike.getLastSeenLongitude() != null) {
@@ -232,8 +256,8 @@ public class LexHandler implements RequestStreamHandler {
         HttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet get = new HttpGet();
         get.setURI(
-                URI.create(
-                        String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%f,%f", bike.getLastSeenLatitude(), bike.getLastSeenLongitude())));
+            URI.create(
+                String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%f,%f", bike.getLastSeenLatitude(), bike.getLastSeenLongitude())));
         HttpResponse response = httpClient.execute(get);
         String responseBlob = IOUtils.toString(response.getEntity().getContent());
         String streetNumber = responseBlob.split("\"formatted_address\" : \"")[1].split("\"")[0];
@@ -242,14 +266,14 @@ public class LexHandler implements RequestStreamHandler {
         String battery = bike.getLastSeenTemperature() != null ? String.valueOf(bike.getLastSeenTemperature()) + " degrees Celsius" : "Unknown temperature";
         String lights = bike.getLastLightsOn() ? "On" : "Off";
         String message = String.format("The status for your bike is:" +
-                        " active cause %s," +
-                        " distance travelled: %s," +
-                        " battery temperature: %s," +
-                        " the lights are: %s," +
-                        " the bike is located at: %s",
-                        cause, distanceTravelled, battery, lights, streetNumber);
+            " active cause %s," +
+            " distance travelled: %s," +
+            " battery temperature: %s," +
+            " the lights are: %s," +
+            " the bike is located at: %s",
+            cause, distanceTravelled, battery, lights, streetNumber);
         output.write(genericResponse.replace("MESSAGE", message)
-                .getBytes());
+            .getBytes());
       } catch (Exception e) {
         output.write(genericResponse.replace("MESSAGE", String.format("I could not find any information about your bike")).getBytes());
       }
