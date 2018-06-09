@@ -1,22 +1,25 @@
 package wirelesscar.hackabike.Util;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import static wirelesscar.hackabike.Util.DynamoDbUtil.mapper;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
 
 import wirelesscar.hackabike.persistance.Bike;
 
 public class BikeUtil {
-  private static AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()
-      .withRegion("us-east-1")
-      .build();
-  private static DynamoDBMapper mapper = new DynamoDBMapper(client);
 
-  public static void addBikeCause(Integer id, String cause) {
-    Bike bike = getBike(id);
-    bike.getCauses().put(cause, 0);
+  public static void addBikeCause(Bike bike, String cause) {
+    if (bike.getCauses() != null) {
+      bike.getCauses().put(cause, 0);
+    } else {
+      Map<String, Integer> causes = new HashMap<>();
+      causes.put(cause, 0);
+      bike.setCauses(causes);
+    }
     bike.setActiveCause(cause);
 
     mapper.save(bike);

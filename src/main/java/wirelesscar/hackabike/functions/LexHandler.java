@@ -75,8 +75,8 @@ public class LexHandler implements RequestStreamHandler {
       newBike.setActiveCause(cause);
       save(newBike);
 
-    } else if (bike.getCauses().get(cause) == null) {
-      addBikeCause(bikeId, cause);
+    } else if (bike.getCauses() == null || bike.getCauses().get(cause) == null) {
+      addBikeCause(bike, cause);
     } else {
       setActiveCause(bikeId, cause);
     }
