@@ -124,12 +124,12 @@ public class LexHandler implements RequestStreamHandler {
 
     Cause cause = getCause(causeId);
     if (cause != null) {
-      String response = "Cause " + causeId.replace("!", "") +
-          " is currently running for " + cause.getSponsor() +
+      String response = "Cause \"" + causeId +
+          "\" is currently running for " + cause.getSponsor() +
           " gathering meters for " +
           cause.getOrganization() +
           ". They have so far reached the distance of: " + cause.getActualDistance() +
-          " meters, of their Goal distance of " + cause.getGoalDistance() + ".";
+          " meters, of their Goal distance of " + cause.getGoalDistance() + " meters.";
       output.write(responseAskForScore.replace("MESSAGE", response).getBytes());
     } else {
       output.write(responseAskForScore.replace("MESSAGE", "Sorry, I don't know that cause.").getBytes());

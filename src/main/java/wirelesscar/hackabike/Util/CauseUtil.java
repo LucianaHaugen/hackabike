@@ -30,21 +30,21 @@ public class CauseUtil {
 
   public static void addCause() {
     Cause causeHealth = new Cause();
-    causeHealth.setCauseId("Get healthy!");
+    causeHealth.setCauseId("Get healthy");
     causeHealth.setSponsor("WirelessCar");
     causeHealth.setGoalDistance(100000L);
     causeHealth.setActualDistance(0.0);
     causeHealth.setOrganization("The Swedish Heart-Lung Foundation");
 
     Cause causeTrafic = new Cause();
-    causeTrafic.setCauseId("Reduce traffic!");
+    causeTrafic.setCauseId("Reduce traffic");
     causeTrafic.setSponsor("Cybercom Group");
     causeTrafic.setGoalDistance(120000L);
     causeTrafic.setActualDistance(0.0);
     causeTrafic.setOrganization("Swedish Society for Nature Conservation");
 
     Cause causeEnviroment = new Cause();
-    causeEnviroment.setCauseId("Save the environment!");
+    causeEnviroment.setCauseId("Save the environment");
     causeEnviroment.setSponsor("Bike Europe");
     causeEnviroment.setGoalDistance(150000L);
     causeEnviroment.setActualDistance(0.0);
