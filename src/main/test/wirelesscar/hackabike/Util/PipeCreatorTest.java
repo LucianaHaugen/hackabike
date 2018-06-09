@@ -1,5 +1,7 @@
 package wirelesscar.hackabike.Util;
 
+import java.io.IOException;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -8,8 +10,9 @@ public class PipeCreatorTest {
   PipeCreator classUndertest = new PipeCreator();
 
   @Test
-  @Ignore
-  public void createPipe() {}
+  public void createPipe() throws IOException {
+
+  }
 
   @Test
   @Ignore

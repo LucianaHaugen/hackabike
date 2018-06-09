@@ -9,9 +9,14 @@ import static wirelesscar.hackabike.Util.CauseUtil.getCause;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,6 +50,9 @@ public class LexHandler implements RequestStreamHandler {
         case "GetBatteryTemperature":
           handleGetBatteryTemperature(json, output);
           break;
+        case "FindMyBike":
+          handleFindMyBike(json, output);
+          break;
         default:
           break;
       }
@@ -54,13 +62,41 @@ public class LexHandler implements RequestStreamHandler {
     }
   }
 
-  private static final String responseBattery = "{  \n" +
+  private void handleFindMyBike(JSONObject json, OutputStream output) throws IOException {
+    int bikeId = Integer.valueOf(json.getJSONObject("currentIntent")
+        .getJSONObject("slots")
+        .getString("BikeId"));
+
+    Bike bike = getBike(bikeId);
+    if (bike != null && bike.getLastSeenLatitude() != null && bike.getLastSeenLongitude() != null) {
+
+      try {
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet();
+        get.setURI(
+            URI.create(
+                String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%f,%f", bike.getLastSeenLatitude(), bike.getLastSeenLongitude())));
+        HttpResponse response = httpClient.execute(get);
+        String responseBlob = IOUtils.toString(response.getEntity().getContent());
+        String streetNumber = responseBlob.split("\"formatted_address\" : \"")[1].split("\"")[0];
+
+        output.write(genericResponse.replace("MESSAGE", String.format("Your bike is at: %s", streetNumber))
+            .getBytes());
+      } catch (Exception e) {
+        output.write(genericResponse.replace("MESSAGE", String.format("I could not find any information about your bike")).getBytes());
+      }
+    } else {
+      output.write(genericResponse.replace("MESSAGE", String.format("I could not find any information about your bike")).getBytes());
+    }
+  }
+
+  private static final String genericResponse = "{  \n" +
       "    \"dialogAction\": {\n" +
       "        \"type\": \"Close\",\n" +
       "        \"fulfillmentState\": \"Fulfilled\",\n" +
       "        \"message\": {\n" +
       "            \"contentType\": \"PlainText\",\n" +
-      "            \"content\": \"Message\"\n" +
+      "            \"content\": \"MESSAGE\"\n" +
       "        }\n" +
       "    }\n" +
       "};";
@@ -71,13 +107,13 @@ public class LexHandler implements RequestStreamHandler {
         .getString("BikeId"));
 
     Bike bike = getBike(bikeId);
-    if (bike != null || bike.getLastSeenTemperature() != null) {
+    if (bike != null && bike.getLastSeenTemperature() != null) {
 
-      output.write(responseBattery.replace("MESSAGE", String.format("The temperature of your battery is: %d degrees celsius", bike.getLastSeenTemperature()))
+      output.write(genericResponse.replace("MESSAGE", String.format("The temperature around your bike is: %d degrees celsius", bike.getLastSeenTemperature()))
           .getBytes());
 
     } else {
-      output.write(responseBattery.replace("MESSAGE", String.format("I could not find any information about your bike battery")).getBytes());
+      output.write(genericResponse.replace("MESSAGE", String.format("I could not find any information about your bike")).getBytes());
     }
   }
 
