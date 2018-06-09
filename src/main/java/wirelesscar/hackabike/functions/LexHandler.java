@@ -109,7 +109,7 @@ public class LexHandler implements RequestStreamHandler {
     Bike bike = getBike(bikeId);
     if (bike != null && bike.getLastSeenTemperature() != null) {
 
-      output.write(genericResponse.replace("MESSAGE", String.format("The temperature around your bike is: %d degrees celsius", bike.getLastSeenTemperature()))
+      output.write(genericResponse.replace("MESSAGE", String.format("The temperature around your bike is %d degrees celsius", bike.getLastSeenTemperature()))
           .getBytes());
 
     } else {
