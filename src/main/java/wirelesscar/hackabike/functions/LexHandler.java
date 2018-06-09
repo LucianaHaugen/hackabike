@@ -156,6 +156,20 @@ public class LexHandler implements RequestStreamHandler {
         .getJSONObject("slots")
         .getString("BikeId"));
 
+    switch (cause.toLowerCase()) {
+      case "save the environment":
+        cause = "Save the environment";
+        break;
+      case "reduce traffic":
+        cause = "Reduce traffic";
+        break;
+      case "get healthy":
+        cause = "Get healthy";
+        break;
+      default:
+        break;
+    }
+
     Bike bike = getBike(bikeId);
     if (bike == null) {
       Bike newBike = new Bike();
