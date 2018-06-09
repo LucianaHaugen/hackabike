@@ -24,7 +24,7 @@ public class ProcessPosition implements RequestHandler<PositionInput, PositionIn
       theBike = new Bike();
       theBike.setBikeId(bikeNr);
       theBike.setDistanceTravelled(0.0);
-      theBike.setActiveCause("Reduce traffic!");
+      theBike.setActiveCause("Reduce traffic");
       theBike.setCauses(new HashMap<>());
       theBike.getCauses().put(theBike.getActiveCause(), 0);
     } else {
