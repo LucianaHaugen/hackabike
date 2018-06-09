@@ -4,6 +4,14 @@ import static wirelesscar.hackabike.Util.BikeUtil.addBikeCause;
 import static wirelesscar.hackabike.Util.BikeUtil.getBike;
 import static wirelesscar.hackabike.Util.BikeUtil.save;
 import static wirelesscar.hackabike.Util.BikeUtil.setActiveCause;
+import static wirelesscar.hackabike.Util.CauseUtil.getCause;
+
+import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
+import com.amazonaws.util.IOUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,14 +19,8 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
-import com.amazonaws.util.IOUtils;
-
 import wirelesscar.hackabike.persistance.Bike;
+import wirelesscar.hackabike.persistance.Cause;
 
 public class LexHandler implements RequestStreamHandler {
 
@@ -36,12 +38,33 @@ public class LexHandler implements RequestStreamHandler {
         case "AskForCauseScore":
           handleAskForScore(json, output);
           break;
+        case "AskAboutCause":
+          handleAskAboutCause(json, output);
         default:
           break;
       }
 
     } catch (JSONException e) {
       System.out.println("Couldn't parse json");
+    }
+  }
+
+  private void handleAskAboutCause(JSONObject json, OutputStream output) throws IOException {
+    String causeId = json.getJSONObject("currentIntent")
+        .getJSONObject("slots")
+        .getString("causeId");
+
+    Cause cause = getCause(causeId);
+    if (cause != null) {
+      String response = "Cause " + causeId.replace("!", "") +
+          " is currently running for " + cause.getSponsor() +
+          " gathering meters for " +
+          cause.getOrganization() +
+          ". They have so far reached the distance of: " + cause.getActualDistance() +
+          " meters, of their Goal distance of " + cause.getGoalDistance() + ".";
+      output.write(responseAskForScore.replace("MESSAGE", response).getBytes());
+    } else {
+      output.write(responseAskForScore.replace("MESSAGE", "Sorry, I don't know how it is going.").getBytes());
     }
   }
 
