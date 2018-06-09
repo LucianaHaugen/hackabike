@@ -44,14 +44,26 @@ public class ProcessPosition implements RequestHandler<PositionInput, PositionIn
         theBike.setDistanceTravelled(theBike.getDistanceTravelled() + distance);
         System.out.println(String.format("New distance travelled: %f", theBike.getDistanceTravelled()));
 
-        // add on the distance travelled to whichever is the current cause for the bike
-        Integer currentCauseScore = theBike.getCauses().get(theBike.getActiveCause());
-        if (currentCauseScore == null) {
-          currentCauseScore = (int) distance;
-          theBike.getCauses().put(theBike.getActiveCause(), currentCauseScore);
-        } else {
-          currentCauseScore = currentCauseScore + (int) distance;
-          theBike.getCauses().put(theBike.getActiveCause(), currentCauseScore);
+        if (theBike.getActiveCause() != null && !theBike.getActiveCause().isEmpty()) {
+          // add on the distance travelled to whichever is the current cause for the bike
+          if (theBike.getCauses() == null) {
+            theBike.setCauses(new HashMap<String, Integer>());
+          }
+
+          if (theBike.getCauses().get(theBike.getActiveCause()) == null) {
+            theBike.getCauses().put(theBike.getActiveCause(), 0);
+          }
+
+          Integer currentCauseScore = theBike.getCauses().get(theBike.getActiveCause());
+
+          if (currentCauseScore == null) {
+            currentCauseScore = (int) distance;
+            theBike.getCauses().put(theBike.getActiveCause(), currentCauseScore);
+          } else {
+            currentCauseScore = currentCauseScore + (int) distance;
+            theBike.getCauses().put(theBike.getActiveCause(), currentCauseScore);
+          }
+
         }
       }
     }
