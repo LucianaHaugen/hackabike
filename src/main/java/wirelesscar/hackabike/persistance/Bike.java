@@ -100,4 +100,19 @@ public class Bike {
   public void setLastLightsOn(Boolean lastLightsOn) {
     this.lastLightsOn = lastLightsOn;
   }
+
+  @Override
+  public String toString() {
+    return "Bike{" +
+            "bikeId=" + bikeId +
+            ", causes=" + causes +
+            ", activeCause='" + activeCause + '\'' +
+            ", lastSeenLatitude=" + lastSeenLatitude +
+            ", lastSeenLongitude=" + lastSeenLongitude +
+            ", lastSeenTimestamp=" + lastSeenTimestamp +
+            ", distanceTravelled=" + distanceTravelled +
+            ", lastSeenTemperature=" + lastSeenTemperature +
+            ", lastLightsOn=" + lastLightsOn +
+            '}';
+  }
 }

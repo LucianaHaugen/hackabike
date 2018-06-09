@@ -251,7 +251,8 @@ public class LexHandler implements RequestStreamHandler {
 
     Bike bike = getBike(bikeId);
     if (bike != null && bike.getLastSeenLatitude() != null && bike.getLastSeenLongitude() != null) {
-
+      String streetNumber = "Unknown";
+      System.out.println("The bike: " + bike.toString());
       try {
         HttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet get = new HttpGet();
@@ -260,23 +261,27 @@ public class LexHandler implements RequestStreamHandler {
                 String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%f,%f", bike.getLastSeenLatitude(), bike.getLastSeenLongitude())));
         HttpResponse response = httpClient.execute(get);
         String responseBlob = IOUtils.toString(response.getEntity().getContent());
-        String streetNumber = responseBlob.split("\"formatted_address\" : \"")[1].split("\"")[0];
-        String cause = bike.getActiveCause() != null ? bike.getActiveCause() : "Unknown cause";
-        String distanceTravelled = bike.getDistanceTravelled() != null ? String.valueOf(bike.getDistanceTravelled()) + " meters" : "Unknown distance";
-        String battery = bike.getLastSeenTemperature() != null ? String.valueOf(bike.getLastSeenTemperature()) + " degrees Celsius" : "Unknown temperature";
-        String lights = bike.getLastLightsOn() ? "On" : "Off";
-        String message = String.format("The status for your bike is:" +
-            " active cause %s," +
-            " distance travelled: %s," +
-            " battery temperature: %s," +
-            " the lights are: %s," +
-            " the bike is located at: %s",
-            cause, distanceTravelled, battery, lights, streetNumber);
-        output.write(genericResponse.replace("MESSAGE", message)
-            .getBytes());
+        streetNumber = responseBlob.split("\"formatted_address\" : \"")[1].split("\"")[0];
       } catch (Exception e) {
-        output.write(genericResponse.replace("MESSAGE", String.format("I could not find any information about your bike")).getBytes());
+        streetNumber = "Latitude: " + bike.getLastSeenLatitude() + ", Longitude: " + bike.getLastSeenLongitude();
       }
+
+      String cause = bike.getActiveCause() != null ? bike.getActiveCause() : "Unknown cause";
+      String distanceTravelled = bike.getDistanceTravelled() != null ? String.valueOf(bike.getDistanceTravelled()) + " meters" : "Unknown distance";
+      String battery = bike.getLastSeenTemperature() != null ? String.valueOf(bike.getLastSeenTemperature()) + " degrees Celsius" : "Unknown temperature";
+      String lights = "Unknown";
+      if(bike.getLastLightsOn() != null){
+        lights = bike.getLastLightsOn() ? "On" : "Off";
+      }
+      String message = String.format("The status for your bike is:" +
+                      " active cause %s," +
+                      " distance travelled: %s," +
+                      " battery temperature: %s," +
+                      " the lights are: %s," +
+                      " the bike is located at: %s",
+              cause, distanceTravelled, battery, lights, streetNumber);
+      output.write(genericResponse.replace("MESSAGE", message)
+              .getBytes());
     } else {
       output.write(genericResponse.replace("MESSAGE", String.format("I could not find any information about your bike")).getBytes());
     }
