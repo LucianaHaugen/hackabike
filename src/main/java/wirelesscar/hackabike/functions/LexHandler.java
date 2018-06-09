@@ -55,12 +55,14 @@ public class LexHandler implements RequestStreamHandler {
           handleFindMyBike(json, output);
           break;
         case "TellMeAboutBike":
+          System.out.println("TellMeAboutBike: run: handleTellMeAboutBike ");
           handleTellMeAboutBike(json, output);
           break;
         case "TellMeAboutCauses":
           handleTellMeAboutCauses(output);
           break;
         default:
+          System.out.println("Did not match any request");
           break;
       }
 
@@ -244,11 +246,11 @@ public class LexHandler implements RequestStreamHandler {
   }
 
   private void handleTellMeAboutBike(JSONObject json, OutputStream output) throws IOException {
-
+    System.out.println("Handle bike status update.");
     int bikeId = Integer.valueOf(json.getJSONObject("currentIntent")
         .getJSONObject("slots")
         .getString("BikeId"));
-
+    System.out.println("Will check information about bike with id: " + bikeId);
     Bike bike = getBike(bikeId);
     if (bike != null && bike.getLastSeenLatitude() != null && bike.getLastSeenLongitude() != null) {
       String streetNumber = "Unknown";
@@ -288,6 +290,7 @@ public class LexHandler implements RequestStreamHandler {
       output.write(genericResponse.replace("MESSAGE", message)
               .getBytes());
     } else {
+      System.out.println("Did not find bike with id 7, object was null");
       output.write(genericResponse.replace("MESSAGE", String.format("I could not find any information about your bike")).getBytes());
     }
 
