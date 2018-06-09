@@ -128,7 +128,7 @@ public class LexHandler implements RequestStreamHandler {
           "' is currently running for " + cause.getSponsor() +
           " gathering meters for " +
           cause.getOrganization() +
-          ". They have so far reached the distance of: " + cause.getActualDistance() +
+          ". They have so far reached the distance of: " + cause.getActualDistance().intValue() +
           " meters, of their Goal distance of " + cause.getGoalDistance().intValue() + " meters.";
       output.write(responseAskForScore.replace("MESSAGE", response).getBytes());
     } else {
