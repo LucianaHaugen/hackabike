@@ -40,6 +40,11 @@
             <artifactId>aws-java-sdk-iotanalytics</artifactId>
             <version>1.11.343</version>
         </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-lambda-java-events</artifactId>
+            <version>1.3.0</version>
+        </dependency>
 
     </dependencies>
 
