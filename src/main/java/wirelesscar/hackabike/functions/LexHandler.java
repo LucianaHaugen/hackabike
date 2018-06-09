@@ -124,8 +124,8 @@ public class LexHandler implements RequestStreamHandler {
 
     Cause cause = getCause(causeId);
     if (cause != null) {
-      String response = "Cause \"" + causeId +
-          "\" is currently running for " + cause.getSponsor() +
+      String response = "Cause '" + causeId +
+          "' is currently running for " + cause.getSponsor() +
           " gathering meters for " +
           cause.getOrganization() +
           ". They have so far reached the distance of: " + cause.getActualDistance() +
