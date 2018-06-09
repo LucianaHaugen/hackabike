@@ -37,8 +37,12 @@ public class ProcessPosition implements RequestHandler<PositionInput, PositionIn
       Double long2 = newPosition.getLongitude();
       if (lat1 != null && long1 != null && lat2 != null && long2 != null) {
         double distance = distance(lat1, lat2, long1, long2, 0, 0);
-        oldDistanceTravelled = theBike.getDistanceTravelled();
+        if (theBike.getDistanceTravelled() == null) {
+          theBike.setDistanceTravelled(0.0);
+        }
+
         theBike.setDistanceTravelled(theBike.getDistanceTravelled() + distance);
+        System.out.println(String.format("New distance travelled: %f", theBike.getDistanceTravelled()));
 
         // add on the distance travelled to whichever is the current cause for the bike
         Integer currentCauseScore = theBike.getCauses().get(theBike.getActiveCause());
