@@ -24,6 +24,8 @@ public class Bike {
 
   private Integer lastSeenTemperature;
 
+  private Boolean lastLightsOn;
+
   @DynamoDBHashKey(attributeName = "bikeId")
   public Integer getBikeId() {
     return bikeId;
@@ -91,4 +93,11 @@ public class Bike {
     this.lastSeenTemperature = lastSeenTemperature;
   }
 
+  public Boolean getLastLightsOn() {
+    return lastLightsOn;
+  }
+
+  public void setLastLightsOn(Boolean lastLightsOn) {
+    this.lastLightsOn = lastLightsOn;
+  }
 }
