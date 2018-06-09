@@ -3,17 +3,16 @@ package wirelesscar.hackabike.lambda;
 import static wirelesscar.hackabike.Util.BikeUtil.getBike;
 import static wirelesscar.hackabike.Util.BikeUtil.save;
 
+import java.util.HashMap;
+
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 
 import wirelesscar.hackabike.persistance.Bike;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
-public class ProcessPosition implements RequestHandler<PositionInput, String> {
+public class ProcessPosition implements RequestHandler<PositionInput, PositionInput> {
 
-  public String handleRequest(PositionInput newPosition, Context context) {
+  public PositionInput handleRequest(PositionInput newPosition, Context context) {
     int bikeNr = 123; // TODO //
     if (newPosition.getBikeId() != null) {
       bikeNr = newPosition.getBikeId();
@@ -58,7 +57,7 @@ public class ProcessPosition implements RequestHandler<PositionInput, String> {
 
     save(theBike);
 
-    return "Old distance travelled: " + oldDistanceTravelled + " ; New distance travelled: " + theBike.getDistanceTravelled();
+    return newPosition;
   }
 
   /**
