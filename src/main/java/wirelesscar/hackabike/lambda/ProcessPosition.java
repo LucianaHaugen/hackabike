@@ -53,7 +53,7 @@ public class ProcessPosition implements RequestHandler<PositionInput, PositionIn
     }
     theBike.setLastSeenLatitude(newPosition.getLatitude());
     theBike.setLastSeenLongitude(newPosition.getLongitude());
-    theBike.setLastSeenTimestamp(newPosition.getTimestampMillis());
+    theBike.setLastSeenTimestamp(newPosition.getTimestamp());
 
     save(theBike);
 

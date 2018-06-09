@@ -7,7 +7,7 @@ public class PositionInput {
 
   Double longitude;
 
-  Long timestampMillis;
+  Long timestamp;
 
   public Double getLatitude() { return latitude; }
 
@@ -21,12 +21,12 @@ public class PositionInput {
 
   public Integer getBikeId() { return bikeId; }
 
-  public Long getTimestampMillis() {
-    return timestampMillis;
+  public Long getTimestamp() {
+    return timestamp;
   }
 
-  public void setTimestampMillis(Long timestampMillis) {
-    this.timestampMillis = timestampMillis;
+  public void setTimestamp(Long timestampMillis) {
+    this.timestamp = timestampMillis;
   }
 
 }
