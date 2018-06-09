@@ -6,18 +6,18 @@ import static wirelesscar.hackabike.Util.BikeUtil.save;
 import static wirelesscar.hackabike.Util.BikeUtil.setActiveCause;
 import static wirelesscar.hackabike.Util.CauseUtil.getCause;
 
-import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
-import com.amazonaws.util.IOUtils;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
+import com.amazonaws.util.IOUtils;
 
 import wirelesscar.hackabike.persistance.Bike;
 import wirelesscar.hackabike.persistance.Cause;
@@ -42,12 +42,42 @@ public class LexHandler implements RequestStreamHandler {
         case "AskAboutCause":
           handleAskAboutCause(json, output);
           break;
+        case "GetBatteryTemperature":
+          handleGetBatteryTemperature(json, output);
+          break;
         default:
           break;
       }
 
     } catch (JSONException e) {
       System.out.println("Couldn't parse json");
+    }
+  }
+
+  private static final String responseBattery = "{  \n" +
+      "    \"dialogAction\": {\n" +
+      "        \"type\": \"Close\",\n" +
+      "        \"fulfillmentState\": \"Fulfilled\",\n" +
+      "        \"message\": {\n" +
+      "            \"contentType\": \"PlainText\",\n" +
+      "            \"content\": \"Message\"\n" +
+      "        }\n" +
+      "    }\n" +
+      "};";
+
+  private void handleGetBatteryTemperature(JSONObject json, OutputStream output) throws IOException {
+    int bikeId = Integer.valueOf(json.getJSONObject("currentIntent")
+        .getJSONObject("slots")
+        .getString("BikeId"));
+
+    Bike bike = getBike(bikeId);
+    if (bike != null || bike.getLastSeenTemperature() != null) {
+
+      output.write(responseBattery.replace("MESSAGE", String.format("The temperature of your battery is: %d degrees celsius", bike.getLastSeenTemperature()))
+          .getBytes());
+
+    } else {
+      output.write(responseBattery.replace("MESSAGE", String.format("I could not find any information about your bike battery")).getBytes());
     }
   }
 
