@@ -20,17 +20,6 @@ import wirelesscar.hackabike.model.LexResponse;
 import wirelesscar.hackabike.persistance.Bike;
 
 public class LexHandler implements RequestStreamHandler {
-  private static final String response = "{  \n" +
-      "    \"dialogAction\": {\n" +
-      "        \"type\": \"Close\",\n" +
-      "        \"fulfillmentState\": \"Fulfilled\",\n" +
-      "        \"message\": {\n" +
-      "            \"contentType\": \"PlainText\",\n" +
-      "            \"content\": \"You are now biking with a cause!\"\n" +
-      "        }\n" +
-      "    }\n" +
-      "};";
-
   public LexResponse oldhandleRequest(LexRequest input, Context context) {
 
     if (getBike(input.getBikeId()).getCauses().get(input.getCause()) != null) {
@@ -48,25 +37,80 @@ public class LexHandler implements RequestStreamHandler {
     System.out.println(String.format("Got: %s", jsonString));
     try {
       JSONObject json = new JSONObject(jsonString);
-      String cause = json.getJSONObject("currentIntent")
-          .getJSONObject("slots")
-          .getString("Cause");
-
-      int bikeId = Integer.valueOf(json.getJSONObject("currentIntent")
-          .getJSONObject("slots")
-          .getString("BikeId"));
-
-      Bike bike = getBike(bikeId);
-      if (bike == null || bike.getCauses().get(cause) == null) {
-        updateBikeCauses(bikeId, cause, 0);
-      } else {
-        setActiveCause(bikeId, cause);
+      String intent = json.getJSONObject("currentIntent").getString("name");
+      switch (intent) {
+        case "SelectCause":
+          handleSelectCause(json, output);
+          break;
+        case "AskForCauseScore":
+          handleAskForScore(json, output);
+          break;
+        default:
+          break;
       }
+
+
 
     } catch (JSONException e) {
       System.out.println("Couldn't parse json");
     }
-    output.write(response.getBytes());
+  }
+
+  private static final String responseSelectCause = "{  \n" +
+    "    \"dialogAction\": {\n" +
+    "        \"type\": \"Close\",\n" +
+    "        \"fulfillmentState\": \"Fulfilled\",\n" +
+    "        \"message\": {\n" +
+    "            \"contentType\": \"PlainText\",\n" +
+    "            \"content\": \"You are now biking with a cause!\"\n" +
+    "        }\n" +
+    "    }\n" +
+    "};";
+
+  private void handleSelectCause(JSONObject json, OutputStream output) throws IOException {
+    String cause = json.getJSONObject("currentIntent")
+      .getJSONObject("slots")
+      .getString("Cause");
+
+    int bikeId = Integer.valueOf(json.getJSONObject("currentIntent")
+      .getJSONObject("slots")
+      .getString("BikeId"));
+
+    Bike bike = getBike(bikeId);
+    if (bike == null || bike.getCauses().get(cause) == null) {
+      updateBikeCauses(bikeId, cause, 0);
+    } else {
+      setActiveCause(bikeId, cause);
+    }
+    output.write(responseSelectCause.getBytes());
+  }
+
+  private static final String responseAskForScore = "{  \n" +
+    "    \"dialogAction\": {\n" +
+    "        \"type\": \"Close\",\n" +
+    "        \"fulfillmentState\": \"Fulfilled\",\n" +
+    "        \"message\": {\n" +
+    "            \"contentType\": \"PlainText\",\n" +
+    "            \"content\": \"MESSAGE\"\n" +
+    "        }\n" +
+    "    }\n" +
+    "};";
+
+  private void handleAskForScore(JSONObject json, OutputStream output) throws IOException {
+    int bikeId = Integer.valueOf(json.getJSONObject("currentIntent")
+      .getJSONObject("slots")
+      .getString("BikeId"));
+
+    Bike bike = getBike(bikeId);
+    Integer currentScore = 0;
+    if (bike.getCauses() != null && bike.getActiveCause() != null && bike.getCauses().get(bike.getActiveCause()) != null) {
+      currentScore = bike.getCauses().get(bike.getActiveCause());
+      String response = "Bike " + bikeId + " is running for the cause of " + bike.getActiveCause().replace("!", "") + " and it has collected " +
+        currentScore + " meters!";
+      output.write(responseAskForScore.replace("MESSAGE", response).getBytes());
+    } else {
+      output.write(responseAskForScore.replace("MESSAGE", "Sorry, I don't know how it is going.").getBytes());
+    }
   }
 
 }
