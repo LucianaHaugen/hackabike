@@ -263,11 +263,16 @@ public class LexHandler implements RequestStreamHandler {
         String responseBlob = IOUtils.toString(response.getEntity().getContent());
         streetNumber = responseBlob.split("\"formatted_address\" : \"")[1].split("\"")[0];
       } catch (Exception e) {
-        streetNumber = "Latitude: " + bike.getLastSeenLatitude() + ", Longitude: " + bike.getLastSeenLongitude();
+          System.out.println("Exception when fetching address: " + e.getMessage());
+          streetNumber = "Latitude: " + bike.getLastSeenLatitude() + ", Longitude: " + bike.getLastSeenLongitude();
       }
 
       String cause = bike.getActiveCause() != null ? bike.getActiveCause() : "Unknown cause";
-      String distanceTravelled = bike.getDistanceTravelled() != null ? String.valueOf(bike.getDistanceTravelled()) + " meters" : "Unknown distance";
+      Double distance = 0.0;
+      if(bike.getDistanceTravelled() != null){
+          distance = bike.getDistanceTravelled();
+      }
+      String distanceTravelled = String.format("%d meters", Math.round(distance));
       String battery = bike.getLastSeenTemperature() != null ? String.valueOf(bike.getLastSeenTemperature()) + " degrees Celsius" : "Unknown temperature";
       String lights = "Unknown";
       if(bike.getLastLightsOn() != null){
