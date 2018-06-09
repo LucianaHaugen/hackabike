@@ -6,9 +6,9 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Process implements RequestHandler<BikeInput, String> {
+public class Process implements RequestHandler<BikeInput, List<Byte>> {
 
-  public String handleRequest(BikeInput rawData, Context context) {
+  public List<Byte> handleRequest(BikeInput rawData, Context context) {
     System.out.println(rawData.toString());
     boolean hasData = true;
     rawData.getType();
@@ -29,6 +29,6 @@ public class Process implements RequestHandler<BikeInput, String> {
       }
     }
     System.out.println(listOfCommands);
-    return rawData.toString() + " raw from bike";
+    return listOfCommands;
   }
 }
