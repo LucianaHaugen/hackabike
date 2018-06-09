@@ -29,6 +29,8 @@ public class ProcessPosition implements RequestHandler<PositionInput, String> {
       theBike.setCauses(new HashMap<>());
       theBike.getCauses().put(theBike.getActiveCause(), 0);
     } else {
+      // TODO // only process updates which have a higher timestamp than the current last-seen-timestamp?
+
       // existing bike -- calculate a delta from lat and long differences of last observation
       Double lat1 = theBike.getLastSeenLatitude();
       Double long1 = theBike.getLastSeenLongitude();
@@ -52,6 +54,7 @@ public class ProcessPosition implements RequestHandler<PositionInput, String> {
     }
     theBike.setLastSeenLatitude(newPosition.getLatitude());
     theBike.setLastSeenLongitude(newPosition.getLongitude());
+    theBike.setLastSeenTimestamp(newPosition.getTimestampMillis());
 
     save(theBike);
 

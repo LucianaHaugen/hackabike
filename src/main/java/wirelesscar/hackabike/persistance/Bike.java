@@ -17,6 +17,9 @@ public class Bike {
 
   private Double lastSeenLatitude;
   private Double lastSeenLongitude;
+
+  private Long lastSeenTimestamp;
+
   private Double distanceTravelled;
 
   @DynamoDBHashKey(attributeName = "bikeId")
@@ -69,4 +72,13 @@ public class Bike {
   public void setDistanceTravelled(Double distanceTravelled) {
     this.distanceTravelled = distanceTravelled;
   }
+
+  public Long getLastSeenTimestamp() {
+    return lastSeenTimestamp;
+  }
+
+  public void setLastSeenTimestamp(Long lastSeenTimestamp) {
+    this.lastSeenTimestamp = lastSeenTimestamp;
+  }
+
 }
