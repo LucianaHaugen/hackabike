@@ -29,7 +29,7 @@ public class ProcessInfo implements RequestHandler<InfoInput, InfoInput> {
 
   Integer transformInfoStringToTemperature(String input) {
     if (input.startsWith("\\x")) {
-      return Integer.parseInt(input.substring(2, 4));
+      return Integer.parseInt(input.substring(2, 4), 16);
     } else {
       return (int) input.getBytes()[0];
     }
