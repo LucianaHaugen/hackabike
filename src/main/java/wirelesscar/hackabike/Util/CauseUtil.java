@@ -15,13 +15,16 @@ public class CauseUtil {
   private static DynamoDBMapper mapper = new DynamoDBMapper(client);
 
   public static Cause getCause(String causeId) {
+    System.out.println("Querying for: " + causeId);
     Cause cause = new Cause();
     cause.setCauseId(causeId);
     DynamoDBQueryExpression<Cause> query = new DynamoDBQueryExpression<Cause>().withHashKeyValues(cause);
     PaginatedQueryList<Cause> query1 = mapper.query(Cause.class, query);
     if (query1.size() > 0) {
+      System.out.println("Found cause in table");
       return query1.get(0);
     }
+    System.out.println("No result found");
     return null;
   }
 
@@ -45,7 +48,7 @@ public class CauseUtil {
     causeEnviroment.setSponsor("Bike Europe");
     causeEnviroment.setGoalDistance(150000L);
     causeEnviroment.setActualDistance(0.0);
-    causeEnviroment.setOrganization("Green Peace");
+    causeEnviroment.setOrganization("Greenpeace");
 
     mapper.save(causeHealth);
     mapper.save(causeTrafic);

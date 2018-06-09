@@ -31,6 +31,7 @@ public class LexHandler implements RequestStreamHandler {
     try {
       JSONObject json = new JSONObject(jsonString);
       String intent = json.getJSONObject("currentIntent").getString("name");
+      System.out.println("Active intent: " + intent);
       switch (intent) {
         case "SelectCause":
           handleSelectCause(json, output);
@@ -40,6 +41,7 @@ public class LexHandler implements RequestStreamHandler {
           break;
         case "AskAboutCause":
           handleAskAboutCause(json, output);
+          break;
         default:
           break;
       }
@@ -64,7 +66,7 @@ public class LexHandler implements RequestStreamHandler {
           " meters, of their Goal distance of " + cause.getGoalDistance() + ".";
       output.write(responseAskForScore.replace("MESSAGE", response).getBytes());
     } else {
-      output.write(responseAskForScore.replace("MESSAGE", "Sorry, I don't know how it is going.").getBytes());
+      output.write(responseAskForScore.replace("MESSAGE", "Sorry, I don't know that cause.").getBytes());
     }
   }
 
